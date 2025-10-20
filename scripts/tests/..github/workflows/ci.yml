@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push: { branches: ["main"] }
+  pull_request:
+  schedule:
+    - cron: "17 7 * * *"   # daily 07:17 UTC
+
+jobs:
+  test-and-benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install deps
+        run: poetry install --no-interaction --no-root
+      - name: Pre-commit
+        run: |
+          poetry run pre-commit install
+          poetry run pre-commit run --all-files
+      - name: Tests
+        run: poetry run pytest -q
+      - name: Train (DVC stage)
+        run: poetry run python scripts/train_phase5.py
+      - name: Benchmark (thresholds)
+        run: poetry run python scripts/benchmark.py
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: artifacts
