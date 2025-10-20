@@ -1,0 +1,24 @@
+stages:
+  train:
+    cmd: poetry run python scripts/train_phase5.py --data data/phase2_benchmark_results.csv --out models/model.pkl --metrics artifacts/metrics.json
+    deps:
+      - scripts/train_phase5.py
+      - src/qlife/metrics.py
+      - src/qlife/data.py
+      - src/qlife/model.py
+      - data/phase2_benchmark_results.csv
+      - params.yaml
+    outs:
+      - models/model.pkl
+    metrics:
+      - artifacts/metrics.json
+  benchmark:
+    cmd: poetry run python scripts/benchmark.py --data data/phase2_benchmark_results.csv --model models/model.pkl --out artifacts
+    deps:
+      - scripts/benchmark.py
+      - src/qlife/metrics.py
+      - src/qlife/model.py
+      - models/model.pkl
+      - params.yaml
+    outs:
+      - artifacts/figs
