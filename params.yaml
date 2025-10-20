@@ -1,0 +1,12 @@
+seed: 42
+train:
+  test_size: 0.2
+  xgb:
+    n_estimators: 500
+    max_depth: 6
+    learning_rate: 0.06
+    subsample: 0.9
+    colsample_bytree: 0.9
+benchmark:
+  r2_min: 0.80         # fail CI if worse
+  gain_pct_min: 20.0   # inverse design target
