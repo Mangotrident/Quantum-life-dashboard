@@ -1,0 +1,16 @@
+# python
+__pycache__/
+*.pyc
+
+# poetry / venv
+.venv/
+
+# dvc & data
+/data/
+*.dvc
+.dvc/
+.dvcignore
+
+# models & artifacts
+/models/
+artifacts/
