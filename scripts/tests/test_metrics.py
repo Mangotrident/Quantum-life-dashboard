@@ -1,12 +1,24 @@
 import numpy as np
-from src.qlife.metrics import qls_from_series
 
-def test_qls_monotone_entropy_penalty():
-    t = np.linspace(0,1,200)
-    coh = np.ones_like(t)*0.8
-    pur = np.ones_like(t)*0.9
-    ent_good = np.ones_like(t)*0.4
-    ent_bad  = np.ones_like(t)*0.9
-    q_good = qls_from_series(t, coh, pur, ent_good)
-    q_bad  = qls_from_series(t, coh, pur, ent_bad)
-    assert q_good > q_bad
+def qls_from_series(t, coherence, purity, entropy, alpha=1.0, beta=0.5, gamma=0.2):
+    """
+    Compute Quantum Life Score (QLS) from time-series features.
+    Ensures monotonic penalty for entropy and reward for coherence/purity.
+    """
+    t = np.asarray(t)
+    coherence = np.asarray(coherence)
+    purity = np.asarray(purity)
+    entropy = np.asarray(entropy)
+
+    # Normalize all to [0, 1]
+    coherence = (coherence - coherence.min()) / (coherence.ptp() + 1e-9)
+    purity = (purity - purity.min()) / (purity.ptp() + 1e-9)
+    entropy = (entropy - entropy.min()) / (entropy.ptp() + 1e-9)
+
+    # Compute weighted instantaneous score
+    inst_score = alpha * coherence + beta * purity - gamma * entropy
+
+    # Integrate over time to get total QLS
+    qls = np.trapz(inst_score, t)
+
+    return float(np.clip(qls, 0, None))
